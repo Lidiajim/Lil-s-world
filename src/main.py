@@ -9,8 +9,14 @@ from Platform import Platform
 pygame.init()
 
 # Configuración de la pantalla
-screen = pygame.display.set_mode((800, 600))
+screen_width = 800
+screen_height = 600
+screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Plataforma")
+
+# Variables para la cámara
+camera_x = 0
+camera_y = 0
 
 # Reloj para controlar la velocidad de actualización de la pantalla
 clock = pygame.time.Clock()
@@ -20,9 +26,13 @@ player = Player(100, 400)
 
 # Inicializa las plataformas
 platforms = [
-    Platform(0, 400, 800, 100),
-    Platform(300, 300, 200, 20),
-    Platform(500, 200, 200, 20)
+    Platform(0, 450, 10000, 100),
+    Platform(300, 350, 200, 20),
+    Platform(500, 250, 200, 20),
+    Platform(700, 150, 200, 20),
+    Platform(900, 350, 200, 20),
+    Platform(1300, 350, 200, 20)
+
 ]
 
 # Bucle principal
@@ -45,13 +55,23 @@ while running:
     # Actualiza el jugador
     player.update()
 
+    # Desplaza la cámara en función de la posición del jugador
+    camera_x = player.x - screen_width / 2 + player.width / 2
+    camera_y = player.y - screen_height / 2 + player.height / 2
+
     # Dibuja el fondo
     screen.fill((255, 255, 255))
 
     # Dibuja las plataformas
     on_platform = False
+    '''
     for platform in platforms:
-        platform.draw(screen)
+        platform.draw(screen)'''
+    for platform in platforms:
+        # Desplaza las plataformas según la posición de la cámara
+        platform_x = platform.x - camera_x
+        platform_y = platform.y - camera_y
+        pygame.draw.rect(screen, (0, 0, 255), (platform_x, platform_y, platform.width, platform.height))
 
         # Verifica si el jugador colisiona con la plataforma
         if (player.x < platform.x + platform.width and
@@ -70,7 +90,10 @@ while running:
         player.on_ground = False
 
     # Dibuja al jugador
-    player.draw(screen)
+    player_x = player.x - camera_x
+    player_y = player.y - camera_y
+    pygame.draw.rect(screen, (255, 0, 0), (player_x, player_y, player.width, player.height))
+
 
     # Actualiza la pantalla
     pygame.display.flip()
