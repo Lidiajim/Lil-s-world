@@ -15,7 +15,7 @@ class Player:
         self.velocity_y = 0
         self.is_jumping = False
         self.on_ground = False
-        
+        self.lives = 3 #Numero inicial de vidas
 
     def move_left(self):
         self.x -= self.speed
@@ -45,6 +45,12 @@ class Player:
             self.on_ground = True
         else:
             self.on_ground = False
+
+    def take_damage(self):
+        self.lives -= 1
+        if self.lives < 0:
+            self.lives = 0
+        # Aquí puedes agregar lógica para finalizar el juego si el jugador se queda sin vidas
 
     def draw(self, screen):
         pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, self.width, self.height))

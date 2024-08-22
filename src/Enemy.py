@@ -8,6 +8,7 @@ class Enemy:
         self.height = height
         self.speed = speed
         self.direction = 1  # 1 para derecha, -1 para izquierda
+        
 
     def update(self):
         # Mueve al enemigo horizontalmente
@@ -27,3 +28,6 @@ class Enemy:
             self.y + self.height > player.y):
             return True
         return False
+
+    def change_direction(self):
+        self.direction *= -1

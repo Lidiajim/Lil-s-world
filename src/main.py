@@ -6,6 +6,48 @@ import pygame
 from Platform import Platform
 from Enemy import Enemy
 
+def show_game_over_screen(screen, font):
+    screen.fill((0, 0, 0))
+    text_game_over = font.render('Game Over', True, (255, 255, 255))
+    text_restart = font.render('Press R to Restart', True, (255, 255, 255))
+    text_quit = font.render('Press Q to Quit', True, (255, 255, 255))
+
+    screen.blit(text_game_over, (screen_width / 2 - text_game_over.get_width() / 2, screen_height / 2 - text_game_over.get_height()))
+    screen.blit(text_restart, (screen_width / 2 - text_restart.get_width() / 2, screen_height / 2))
+    screen.blit(text_quit, (screen_width / 2 - text_quit.get_width() / 2, screen_height / 2 + 40))
+
+    pygame.display.flip()
+
+    waiting_for_input = True
+    while waiting_for_input:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    return 'restart'
+                elif event.key == pygame.K_q:
+                    pygame.quit()
+                    quit()
+
+def reset_game():
+    global player, platforms, enemies
+    player = Player(100, 400)
+    platforms = [
+        Platform(0, 450, 10000, 100),
+        Platform(300, 350, 200, 20),
+        Platform(500, 250, 200, 20),
+        Platform(700, 150, 200, 20),
+        Platform(900, 350, 200, 20),
+        Platform(1300, 350, 200, 20)
+
+    ]
+    enemies = [
+        Enemy(200, 400, 50, 50, 2),  # Ajusta la posición Y para que esté en la misma altura que el suelo
+        Enemy(600, 400, 50, 50, 2)   # Ajusta la posición Y para que esté en la misma altura que el suelo
+    ]
+
 # Inicializa Pygame
 pygame.init()
 
@@ -21,6 +63,9 @@ camera_y = 0
 
 # Reloj para controlar la velocidad de actualización de la pantalla
 clock = pygame.time.Clock()
+
+# Fuente para el texto
+font = pygame.font.Font(None, 36)
 
 # Inicializa el jugador
 player = Player(100, 400)
@@ -44,7 +89,17 @@ enemies = [
 
 # Bucle principal
 running = True
+game_over = False
 while running:
+    if game_over:
+        action = show_game_over_screen(screen, font)
+        if action == 'restart':
+            reset_game()
+            game_over = False
+        elif action == 'quit':
+            running = False
+        continue
+        
     # Manejo de eventos
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -103,15 +158,25 @@ while running:
 
         # Verifica la colisión con el jugador
         if enemy.collide(player):
-            print("¡Colisión con enemigo!")
-            # Aquí puedes agregar la lógica para manejar la colisión, como reiniciar el nivel o restar vidas
+            player.take_damage()  # Resta una vida al jugador
+            print(f"¡Colisión con enemigo! Vidas restantes: {player.lives}")
 
+            # Cambia la dirección del enemigo
+            enemy.change_direction()
+
+    # Si el jugador se queda sin vidas, muestra el menú de Game Over
+    if player.lives <= 0:
+        game_over = True
+        continue
 
     # Dibuja al jugador
     player_x = player.x - camera_x
     player_y = player.y - camera_y
     pygame.draw.rect(screen, (255, 0, 0), (player_x, player_y, player.width, player.height))
 
+    # Dibuja el número de vidas restantes
+    text = font.render(f'Vidas: {player.lives}', True, (0, 0, 0))
+    screen.blit(text, (10, 10))
 
     # Actualiza la pantalla
     pygame.display.flip()
@@ -121,3 +186,5 @@ while running:
 
 # Cierra Pygame
 pygame.quit()
+
+
