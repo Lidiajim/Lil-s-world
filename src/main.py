@@ -32,14 +32,14 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-            
+
     # Controles del jugador
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         player.move_left()
     if keys[pygame.K_RIGHT]:
         player.move_right()
-    if keys[pygame.K_SPACE] and not player.is_jumping:
+    if keys[pygame.K_SPACE]:
         player.jump()
 
     # Actualiza el jugador
@@ -48,19 +48,30 @@ while running:
     # Dibuja el fondo
     screen.fill((255, 255, 255))
 
-    # Dibuja al jugador
-    player.draw(screen)
-
     # Dibuja las plataformas
+    on_platform = False
     for platform in platforms:
         platform.draw(screen)
 
         # Verifica si el jugador colisiona con la plataforma
-        if platform.collide(player):
-            if player.y + 50 <= platform.y + platform.height and player.y + 50 > platform.y:
-                player.y = platform.y - 50  # Ajusta la posición vertical del jugador para que se quede en la plataforma
-                player.is_jumping = False  # Asegúrate de que el jugador no esté en el aire
-                on_platform = True
+        if (player.x < platform.x + platform.width and
+            player.x + player.width > platform.x and
+            player.y + player.height > platform.y and
+            player.y + player.height - player.velocity_y <= platform.y):
+            # Ajusta la posición vertical del jugador para que se quede en la plataforma
+            player.y = platform.y - player.height
+            player.velocity_y = 0
+            player.is_jumping = False
+            player.on_ground = True
+            on_platform = True
+
+    # Si el jugador no está en una plataforma, está en el aire
+    if not on_platform and player.y < 400:
+        player.on_ground = False
+
+    # Dibuja al jugador
+    player.draw(screen)
+
     # Actualiza la pantalla
     pygame.display.flip()
 
@@ -69,4 +80,3 @@ while running:
 
 # Cierra Pygame
 pygame.quit()
-

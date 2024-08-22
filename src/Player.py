@@ -5,37 +5,45 @@ import pygame
 
 class Player:
     def __init__(self, x, y):
-        self.x = x  # eje horizontal
-        self.y = y  # eje vertical
-        self.speed = 5  # velocidad de movimiento
-        self.jump_strength = 15
-        self.gravity = 1
+        self.x = x
+        self.y = y
+        self.width = 50
+        self.height = 50
+        self.speed = 5
+        self.jump_strength = 30
+        self.gravity = 3
         self.velocity_y = 0
         self.is_jumping = False
         self.on_ground = False
 
-
-# mueve el personaje hacia la izquierda  <--
     def move_left(self):
-        self.x -= self.speed 
+        self.x -= self.speed
 
-# mueve el personaje hacia la derecha  -->
     def move_right(self):
         self.x += self.speed
 
-# hace que el personaje salte
     def jump(self):
-        if not self.is_jumping:
+        if self.on_ground:
             self.is_jumping = True
-            self.y -= 100  # reduce y para mover el personaje hacia arriba  ( el eje y aumenta hacia abajo)
+            self.velocity_y = -self.jump_strength
+            self.on_ground = False
 
-# Actualiza la posición del personaje, especialmente la posición vertical durante un salto
     def update(self):
         if self.is_jumping:
-            self.y += 5  # aumenta y para simular la gravedad y que el personaje caiga
-            if self.y >= 400:  # si el personaje ha vuelto al suelo (y = 400)
-                self.is_jumping = False
-                self.y = 400 # restablece la posición vertical del personaje
+            self.velocity_y += self.gravity  # Aplicar gravedad cuando está saltando
+        else:
+            self.velocity_y = self.gravity  # Aplicar gravedad cuando está cayendo
+
+        self.y += self.velocity_y
+
+        # Verifica si el jugador ha tocado el suelo
+        if self.y >= 400:  # Ajusta según la altura del suelo
+            self.y = 400
+            self.velocity_y = 0
+            self.is_jumping = False
+            self.on_ground = True
+        else:
+            self.on_ground = False
 
     def draw(self, screen):
-        pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, 50, 50))
+        pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, self.width, self.height))
