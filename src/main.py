@@ -57,6 +57,11 @@ screen_height = 600
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Plataforma")
 
+# Cargar la imagen de fondo
+background_image = pygame.image.load('assets/fondo1.jpg')
+background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
+
+
 # Variables para la cámara
 camera_x = 0
 camera_y = 0
@@ -121,8 +126,17 @@ while running:
     camera_x = player.x - screen_width / 2 + player.width / 2
     camera_y = player.y - screen_height / 2 + player.height / 2
 
+    '''
     # Dibuja el fondo
     screen.fill((255, 255, 255))
+    '''
+
+ # Dibuja la imagen de fondo, repitiéndola si es necesario
+    bg_width, bg_height = background_image.get_size()
+    for x in range(-int(camera_x) // bg_width, (screen_width - int(camera_x)) // bg_width + 2):
+        for y in range(-int(camera_y) // bg_height, (screen_height - int(camera_y)) // bg_height + 2):
+            screen.blit(background_image, (x * bg_width - int(camera_x) % bg_width, y * bg_height - int(camera_y) % bg_height))
+
 
     # Dibuja las plataformas
     on_platform = False

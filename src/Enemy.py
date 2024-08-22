@@ -22,11 +22,18 @@ class Enemy:
         pygame.draw.rect(screen, (0, 255, 0), (self.x - camera_x, self.y - camera_y, self.width, self.height))
 
     def collide(self, player):
-        if (self.x < player.x + player.width and
-            self.x + self.width > player.x and
-            self.y < player.y + player.height and
-            self.y + self.height > player.y):
-            return True
+        # Verifica si el jugador está dentro del área del enemigo
+        if (player.x < self.x + self.width and
+            player.x + player.width > self.x and
+            player.y < self.y + self.height and
+            player.y + player.height > self.y):
+            
+            # Verifica si el jugador está colisionando desde abajo o los lados
+            if player.y + player.height - player.velocity_y <= self.y + self.height and player.y + player.height >= self.y:
+                return True  # Colisión desde abajo
+            elif player.x + player.width > self.x and player.x < self.x + self.width:
+                return True  # Colisión desde los lados
+
         return False
 
     def change_direction(self):
