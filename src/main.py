@@ -4,6 +4,7 @@
 from Player import Player
 import pygame
 from Platform import Platform
+from Enemy import Enemy
 
 # Inicializa Pygame
 pygame.init()
@@ -33,6 +34,12 @@ platforms = [
     Platform(900, 350, 200, 20),
     Platform(1300, 350, 200, 20)
 
+]
+
+# Inicializa los enemigos
+enemies = [
+    Enemy(200, 400, 50, 50, 2),  # Ajusta la posición Y para que esté en la misma altura que el suelo
+    Enemy(600, 400, 50, 50, 2)   # Ajusta la posición Y para que esté en la misma altura que el suelo
 ]
 
 # Bucle principal
@@ -88,6 +95,17 @@ while running:
     # Si el jugador no está en una plataforma, está en el aire
     if not on_platform and player.y < 400:
         player.on_ground = False
+
+    # Dibuja los enemigos
+    for enemy in enemies:
+        enemy.update()
+        enemy.draw(screen, camera_x, camera_y)
+
+        # Verifica la colisión con el jugador
+        if enemy.collide(player):
+            print("¡Colisión con enemigo!")
+            # Aquí puedes agregar la lógica para manejar la colisión, como reiniciar el nivel o restar vidas
+
 
     # Dibuja al jugador
     player_x = player.x - camera_x

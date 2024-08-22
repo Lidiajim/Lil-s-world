@@ -15,6 +15,7 @@ class Player:
         self.velocity_y = 0
         self.is_jumping = False
         self.on_ground = False
+        
 
     def move_left(self):
         self.x -= self.speed
