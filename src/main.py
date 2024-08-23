@@ -82,7 +82,10 @@ platforms = [
     Platform(500, 250, 200, 20),
     Platform(700, 150, 200, 20),
     Platform(900, 350, 200, 20),
-    Platform(1300, 350, 200, 20)
+    Platform(1300, 350, 200, 20),
+    Platform(1500, 150, 200, 20),
+    Platform(1700, 250, 200, 20),
+    Platform(1900, 350, 200, 20)
 
 ]
 
@@ -165,18 +168,24 @@ while running:
     if not on_platform and player.y < 400:
         player.on_ground = False
 
-    # Dibuja los enemigos
+    # Verifica colisiones con los enemigos y elimina si colisiona desde arriba
+    enemies_to_remove = []
     for enemy in enemies:
         enemy.update()
         enemy.draw(screen, camera_x, camera_y)
 
-        # Verifica la colisión con el jugador
-        if enemy.collide(player):
+        collision = enemy.collide(player)
+        if collision == 'top':
+            enemies_to_remove.append(enemy)  # Marcar enemigo para eliminar
+            player.velocity_y = -10  # Rebote del jugador tras eliminar al enemigo
+        elif collision == 'side':
             player.take_damage()  # Resta una vida al jugador
             print(f"¡Colisión con enemigo! Vidas restantes: {player.lives}")
-
-            # Cambia la dirección del enemigo
             enemy.change_direction()
+
+    # Eliminar los enemigos marcados
+    for enemy in enemies_to_remove:
+        enemies.remove(enemy)
 
     # Si el jugador se queda sin vidas, muestra el menú de Game Over
     if player.lives <= 0:
